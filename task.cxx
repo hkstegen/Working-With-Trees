@@ -6,6 +6,7 @@
 #include <TROOT.h>
 #include <TH2.h>
 #include <TLorentzVector.h>
+#include <TMath.h>
 
 void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 	{
@@ -41,6 +42,7 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 		Float_t Px_l0114, Py_l0114, Pz_l0114, Pt_l0114, En_l0114;
 		Float_t Px_l0201, Py_l0201, Pz_l0201, Pt_l0201, En_l0201;
 		Float_t Px_l0301, Py_l0301, Pz_l0301, Pt_l0301, En_l0301;
+		Float_t Px_bm, Py_bm, Pz_bm, Pt_bm;
 			
 		tree->SetBranchAddress("Px_l0114", &Px_l0114);
 		tree->SetBranchAddress("Py_l0114", &Py_l0114);
@@ -60,30 +62,38 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 		tree->SetBranchAddress("Pt_l0301", &Pt_l0301);
 		tree->SetBranchAddress("En_l0301", &En_l0301);
 		
+		tree->SetBranchAddress("Px_bm", &Py_l0301);
+		tree->SetBranchAddress("Py_bm", &Pz_l0301);
+		tree->SetBranchAddress("Pz_bm", &Pt_l0301);
+		tree->SetBranchAddress("Pt_bm", &En_l0301);
+				
 		TLorentzVector v1;
 		TLorentzVector v2;
 		TLorentzVector v3;
-		TLorentzVector v4;		
+		TLorentzVector v4;
+		TLorentzVector v5;	
+		TLorentzVector v6;	
 		
 		Float_t Px1n, Py1n, Pz1n;
 		Float_t Px2n, Py2n, Pz2n;
 		Float_t Px3n, Py3n, Pz3n;
 		
+		Float_t PxBm, PyBm, PzBm;
+		
 		Double_t theta1, phi1;
 		Double_t theta2, phi2;
 		Double_t theta3, phi3;
 		Double_t InMass;
-		Double_t ProMass = 0.938272;
 		Double_t MissMass;
 		
-		TH1F *Theta2 = new TH1F("Theta2", "Photon l0201 - Theta", 100, 0, 7);
-		TH1F *Phi2 = new TH1F("Phi2", "Photon l0201 - Phi", 100, 244, 7);
-		TH1F *Theta3 = new TH1F("Theta3", "Photon l0301 - Theta", 100, 0, 7);
-		TH1F *Phi3 = new TH1F("Phi3", "Photon l0301 - Phi", 100, 0, 7);
+		TH1F *Theta2 = new TH1F("Theta2", "Photon l0201 - Theta", 100, 0, 360);
+		TH1F *Phi2 = new TH1F("Phi2", "Photon l0201 - Phi", 100, 0, 360);
+		TH1F *Theta3 = new TH1F("Theta3", "Photon l0301 - Theta", 100, 0, 360);
+		TH1F *Phi3 = new TH1F("Phi3", "Photon l0301 - Phi", 100, 0, 360);
 		TH1F *Mass_GeV = new TH1F("Mass_GeV", "Invarient Mass (GeV/c^2)", 100, 0, 0.25);
 		TH1F *Mass_MeV = new TH1F("Mass_MeV", "Invarient Mass (MeV/c^2)", 100, 0, 250);
-		TH1F *MissMass_GeV = new TH1F("MissMass_GeV", "Missing Mass (GeV/c^2)", 100, 0.800, 0.810);
-		TH1F *MissMass_MeV = new TH1F("MissMass_MeV", "Missing Mass (MeV/c^2)", 100, 800, 810);
+		TH1F *MissMass_GeV = new TH1F("MissMass_GeV", "Missing Mass (GeV/c^2)", 100, 0.900, 1.000);
+		TH1F *MissMass_MeV = new TH1F("MissMass_MeV", "Missing Mass (MeV/c^2)", 100, 900, 1000);
 		
 		for (Int_t i=0;i<nentries; i++)
 			{
@@ -101,26 +111,32 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 				Py3n=Py_l0301*Pt_l0301;
 				Pz3n=Pz_l0301*Pt_l0301;
 				
+				PxBm=Px_bm*Pt_bm;
+				PyBm=Py_bm*Pt_bm;
+				PzBm=Pz_bm*Pt_bm;
+				
 				v1.SetPxPyPzE(Px1n,Py1n,Pz1n,En_l0114);
 				v2.SetPxPyPzE(Px2n,Py2n,Pz2n,En_l0201);
 				v3.SetPxPyPzE(Px3n,Py3n,Pz3n,En_l0301);
+				v5.SetPxPyPzE(PxBm,PyBm,PzBm,En_bm);
 				
 				Double_t theta2 = v2.Theta();
 				Double_t phi2 = v2.Phi();
 				Double_t theta3 = v3.Theta();
 				Double_t phi3 = v3.Phi();
 				
-				Theta2->Fill(theta2);
-				Phi2->Fill(phi2);
-				Theta3->Fill(theta3);
-				Phi3->Fill(phi3);
+				Theta2->Fill(theta2*(180/3.14));
+				Phi2->Fill(phi2*(180/3.14));
+				Theta3->Fill(theta3*(180/3.14));
+				Phi3->Fill(phi3*(180/3.14));
 				
 				v4 = v2+v3; 
 				InMass = v4.M();
 				Mass_GeV->Fill(InMass);
 				Mass_MeV->Fill(InMass*1000);
 				
-				MissMass = ProMass-InMass;
+				v6=v5+v1-v4;				
+				MissMass = v6.M();
 				MissMass_GeV->Fill(MissMass);
 				MissMass_MeV->Fill(MissMass*1000);
 				
@@ -135,13 +151,16 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 			Phi3->GetXaxis()->SetTitle("Angle (rads)");
 			Phi3->GetYaxis()->SetTitle("# of Counts");
 			
-			canvas2 = new TCanvas("Photon Angles", "Photon Angles");
-			canvas2->Divide(1,4);
+			canvas2a = new TCanvas("Photon l0201 Angles", "Photon l0201 Angles");
+			canvas2a->Divide(1,2);
 			
-			canvas2->cd(1); Theta2->Draw();
-			canvas2->cd(2); Phi2->Draw();
-			canvas2->cd(3); Theta3->Draw();
-			canvas2->cd(4); Phi3->Draw();
+			canvas2b = new TCanvas("Photon l0301 Angles", "Photon l0301 Angles");
+			canvas2b->Divide(1,2);
+			
+			canvas2a->cd(1); Theta2->Draw();
+			canvas2a->cd(2); Phi2->Draw();
+			canvas2b->cd(1); Theta3->Draw();
+			canvas2b->cd(2); Phi3->Draw();
 			
 			Mass_GeV->GetXaxis()->SetTitle("Invarient Mass (GeV/c^2)");
 			Mass_GeV->GetYaxis()->SetTitle("# of counts");
