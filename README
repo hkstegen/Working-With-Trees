@@ -1,1 +1,9 @@
 What is this amateur hour? ...figure it out...
+
+
+
+
+But really this Macro opens a tree file of a data set of pion photoproduction and plots the energy of the incoming photon
+beam in both GeV and MeV. With the use of TLorentzVectors a canvas then displays the theta and phi (radians) values of the two decay 
+photons. The invarient mass (GeV/c^2 and MeV/c^2) is found by adding the TLorentzVetors of the two photons and graphing the magnitude. Lastly the 
+missing mass (GeV/c^2 and MeV/c^2) is found and graphed by substracting the invarient mass from the mass of a proton.
