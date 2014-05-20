@@ -33,11 +33,11 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 				
 			}
 			
-		canvas1 = new TCanvas("En_bm", "En_bm as function of GeV and MeV");
-		canvas1->Divide(1,2);
+		canvasEnergyBeam = new TCanvas("En_bm", "En_bm as function of GeV and MeV");
+		canvasEnergyBeam->Divide(1,2);
 			
-		canvas1->cd(1); En_bm_GeV->Draw();
-		canvas1->cd(2); En_bm_MeV->Draw();
+		canvasEnergyBeam->cd(1); En_bm_GeV->Draw();
+		canvasEnergyBeam->cd(2); En_bm_MeV->Draw();
 		
 		Float_t Px_l0114, Py_l0114, Pz_l0114, Pt_l0114, En_l0114;
 		Float_t Px_l0201, Py_l0201, Pz_l0201, Pt_l0201, En_l0201;
@@ -62,17 +62,18 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 		tree->SetBranchAddress("Pt_l0301", &Pt_l0301);
 		tree->SetBranchAddress("En_l0301", &En_l0301);
 		
-		tree->SetBranchAddress("Px_bm", &Py_l0301);
-		tree->SetBranchAddress("Py_bm", &Pz_l0301);
-		tree->SetBranchAddress("Pz_bm", &Pt_l0301);
-		tree->SetBranchAddress("Pt_bm", &En_l0301);
+		tree->SetBranchAddress("Px_bm", &Px_bm);
+		tree->SetBranchAddress("Py_bm", &Py_bm);
+		tree->SetBranchAddress("Pz_bm", &Pz_bm);
+		tree->SetBranchAddress("Pt_bm", &Pt_bm);
 				
-		TLorentzVector v1;
-		TLorentzVector v2;
-		TLorentzVector v3;
-		TLorentzVector v4;
-		TLorentzVector v5;	
-		TLorentzVector v6;	
+		TLorentzVector vProton;
+		TLorentzVector vPhotonl0201;
+		TLorentzVector vPhotonl0301;
+		TLorentzVector vPion;
+		TLorentzVector vBeam;	
+		TLorentzVector vMissingMass;
+		TLorentzVector vTagger(0,0,0,0.938);	
 		
 		Float_t Px1n, Py1n, Pz1n;
 		Float_t Px2n, Py2n, Pz2n;
@@ -86,10 +87,10 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 		Double_t InMass;
 		Double_t MissMass;
 		
-		TH1F *Theta2 = new TH1F("Theta2", "Photon l0201 - Theta", 100, 0, 360);
-		TH1F *Phi2 = new TH1F("Phi2", "Photon l0201 - Phi", 100, 0, 360);
-		TH1F *Theta3 = new TH1F("Theta3", "Photon l0301 - Theta", 100, 0, 360);
-		TH1F *Phi3 = new TH1F("Phi3", "Photon l0301 - Phi", 100, 0, 360);
+		TH1F *Theta2 = new TH1F("Theta2", "Photon l0201 - Theta", 100, 0, 180);
+		TH1F *Phi2 = new TH1F("Phi2", "Photon l0201 - Phi", 100, -180, 180);
+		TH1F *Theta3 = new TH1F("Theta3", "Photon l0301 - Theta", 100, 0, 180);
+		TH1F *Phi3 = new TH1F("Phi3", "Photon l0301 - Phi", 100, -180, 180);
 		TH1F *Mass_GeV = new TH1F("Mass_GeV", "Invarient Mass (GeV/c^2)", 100, 0, 0.25);
 		TH1F *Mass_MeV = new TH1F("Mass_MeV", "Invarient Mass (MeV/c^2)", 100, 0, 250);
 		TH1F *MissMass_GeV = new TH1F("MissMass_GeV", "Missing Mass (GeV/c^2)", 100, 0.900, 1.000);
@@ -115,28 +116,28 @@ void LearningTrees(Char_t* name = "Pi0_mc_out_250.root")
 				PyBm=Py_bm*Pt_bm;
 				PzBm=Pz_bm*Pt_bm;
 				
-				v1.SetPxPyPzE(Px1n,Py1n,Pz1n,En_l0114);
-				v2.SetPxPyPzE(Px2n,Py2n,Pz2n,En_l0201);
-				v3.SetPxPyPzE(Px3n,Py3n,Pz3n,En_l0301);
-				v5.SetPxPyPzE(PxBm,PyBm,PzBm,En_bm);
+				vProton.SetPxPyPzE(Px1n,Py1n,Pz1n,En_l0114);
+				vPhotonl0201.SetPxPyPzE(Px2n,Py2n,Pz2n,En_l0201);
+				vPhotonl0301.SetPxPyPzE(Px3n,Py3n,Pz3n,En_l0301);
+				vBeam.SetPxPyPzE(PxBm,PyBm,PzBm,En_bm);
 				
-				Double_t theta2 = v2.Theta();
-				Double_t phi2 = v2.Phi();
-				Double_t theta3 = v3.Theta();
-				Double_t phi3 = v3.Phi();
+				Double_t theta2 = vPhotonl0201.Theta();
+				Double_t phi2 = vPhotonl0201.Phi();
+				Double_t theta3 = vPhotonl0301.Theta();
+				Double_t phi3 = vPhotonl0301.Phi();
 				
 				Theta2->Fill(theta2*(180/3.14));
 				Phi2->Fill(phi2*(180/3.14));
 				Theta3->Fill(theta3*(180/3.14));
 				Phi3->Fill(phi3*(180/3.14));
 				
-				v4 = v2+v3; 
-				InMass = v4.M();
+				vPion = vPhotonl0201+vPhotonl0301; 
+				InMass = vPion.M();
 				Mass_GeV->Fill(InMass);
 				Mass_MeV->Fill(InMass*1000);
 				
-				v6=v5+v1-v4;				
-				MissMass = v6.M();
+				vMissingMass = vBeam+vTagger-vPion;				
+				MissMass = vMissingMass.M();
 				MissMass_GeV->Fill(MissMass);
 				MissMass_MeV->Fill(MissMass*1000);
 				
